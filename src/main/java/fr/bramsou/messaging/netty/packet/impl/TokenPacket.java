@@ -1,7 +1,5 @@
 package fr.bramsou.messaging.netty.packet.impl;
 
-
-import fr.bramsou.messaging.netty.NettyNetwork;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
@@ -22,11 +20,6 @@ public class TokenPacket implements NettyPacket {
     @Override
     public void serialize(PacketBuffer buffer) {
         buffer.writeString(this.token);
-    }
-
-    @Override
-    public void read(NettyNetwork network) {
-        System.out.println("Received token: " + this.token);
     }
 
     public String getToken() {

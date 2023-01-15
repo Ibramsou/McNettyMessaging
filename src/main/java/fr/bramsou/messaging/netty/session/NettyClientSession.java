@@ -36,7 +36,7 @@ public class NettyClientSession implements NettySession {
     }
 
     @Override
-    public void channelActive() {
+    public void connected() {
         this.network.sendPacket(new TokenPacket("Hi !"));
     }
 }

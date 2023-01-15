@@ -1,6 +1,7 @@
 package fr.bramsou.messaging.netty.session;
 
 import fr.bramsou.messaging.netty.NettyNetwork;
+import fr.bramsou.messaging.netty.util.DisconnectReason;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -10,5 +11,13 @@ public interface NettySession {
 
     NettyNetwork getNetwork();
 
-    default void channelActive() {}
+    default void connected() {}
+
+    default void disconnected(DisconnectReason reason, Throwable cause) {
+        if (reason == DisconnectReason.EXCEPTION_CAUGHT) {
+            throw new RuntimeException(reason.getMessage(), cause);
+        } else {
+            //TODO: Log
+        }
+    }
 }

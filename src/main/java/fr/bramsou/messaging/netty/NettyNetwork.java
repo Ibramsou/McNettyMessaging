@@ -2,6 +2,7 @@ package fr.bramsou.messaging.netty;
 
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.session.NettySession;
+import fr.bramsou.messaging.netty.util.DisconnectReason;
 import fr.bramsou.messaging.netty.util.TaskHandler;
 import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
@@ -40,36 +41,34 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        String message;
+        DisconnectReason reason;
         if (cause instanceof ConnectTimeoutException || (cause instanceof ConnectException && cause.getMessage().contains("connection timed out"))) {
-            message = "Connection timed out.";
+            reason = DisconnectReason.CONNECTION_TIMED_OUT;
         } else if (cause instanceof ReadTimeoutException) {
-            message = "Read timed out.";
+            reason = DisconnectReason.READ_TIMED_OUT;
         } else if (cause instanceof WriteTimeoutException) {
-            message = "Write timed out.";
+            reason = DisconnectReason.WRITE_TIMED_OUT;
         } else {
-            message = cause.toString();
+            reason = DisconnectReason.EXCEPTION_CAUGHT;
         }
 
-        this.disconnect(message, cause);
+        this.disconnect(reason, cause);
     }
 
-    public void disconnect(String reason) {
+    public void disconnect(DisconnectReason reason) {
         this.disconnect(reason, null);
     }
 
-    public void disconnect(String reason, Throwable cause) {
+    public void disconnect(DisconnectReason reason, Throwable cause) {
         if (this.disconnected) return;
 
         this.disconnected = true;
 
         if (this.channel != null && this.channel.isOpen()) {
-            this.channel.flush().close();
+            this.channel.close();
         }
 
-        if (cause != null) {
-            throw new RuntimeException("Exception while disconnecting", cause);
-        }
+        this.session.disconnected(reason, cause);
     }
 
 
@@ -80,15 +79,14 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
             return;
         }
 
-        System.out.println("ACTIVE");
         this.channel = ctx.channel();
-        this.session.channelActive();
+        this.session.connected();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         if (ctx.channel() == this.channel) {
-            this.disconnect(null);
+            this.disconnect(DisconnectReason.HOST_DISCONNECTED, null);
         }
     }
 
