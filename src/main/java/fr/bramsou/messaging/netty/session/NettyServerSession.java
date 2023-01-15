@@ -10,9 +10,9 @@ import java.net.SocketAddress;
 
 public class NettyServerSession implements NettySession {
 
-    private final NettyNetwork network = new NettyNetwork();
+    private final NettyNetwork network = new NettyNetwork(this);
 
-    public void bindConnection(int port) {
+    public NettyServerSession bindConnection(int port) {
         final SocketAddress address = AddressResolver.resolveAddress(port);
 
         final ServerBootstrap bootstrap = new ServerBootstrap();
@@ -21,6 +21,8 @@ public class NettyServerSession implements NettySession {
         bootstrap.group(EVENT_LOOP_GROUP.next());
         bootstrap.localAddress(address);
         bootstrap.bind().syncUninterruptibly();
+
+        return this;
     }
 
     @Override

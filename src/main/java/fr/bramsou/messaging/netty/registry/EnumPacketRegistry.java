@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum EnumPacketRegistry {
-    TOKEN_PACKET(0x00,TokenPacket .class, TokenPacket::new);
+    TOKEN_PACKET(0x00, TokenPacket .class, TokenPacket::new);
 
     public static final Map<Integer, PacketConstructor<? extends NettyPacket>> DECODER_PACKET = new HashMap<>();
     public static final  Map<Class<? extends NettyPacket>, Integer> ENCODER_PACKETS = new HashMap<>();

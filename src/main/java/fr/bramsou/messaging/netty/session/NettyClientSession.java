@@ -12,9 +12,9 @@ import java.net.SocketAddress;
 
 public class NettyClientSession implements NettySession {
 
-    private final NettyNetwork network = new NettyNetwork();
+    private final NettyNetwork network = new NettyNetwork(this);
 
-    public void createConnection(int port) {
+    public NettyClientSession createConnection(int port) {
         final Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.handler(new NettyInitializer(this.network));
@@ -25,6 +25,8 @@ public class NettyClientSession implements NettySession {
         bootstrap.localAddress("0.0.0.0", 0);
         bootstrap.remoteAddress(address);
         bootstrap.connect();
+
+        return this;
     }
 
 

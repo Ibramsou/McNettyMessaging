@@ -1,4 +1,4 @@
 name: ProxyMessaging
 author: Bramsou
 version: "1.0"
-main: fr.bramsou.messaging.proxy.ProxyMessaging
+main: fr.bramsou.messaging.bungee.BungeePlugin

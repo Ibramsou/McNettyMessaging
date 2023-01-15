@@ -1,6 +1,7 @@
 package fr.bramsou.messaging.netty;
 
 import fr.bramsou.messaging.netty.packet.NettyPacket;
+import fr.bramsou.messaging.netty.session.NettySession;
 import fr.bramsou.messaging.netty.util.TaskHandler;
 import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
@@ -10,8 +11,13 @@ import java.net.ConnectException;
 
 public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> implements TaskHandler {
 
+    private final NettySession session;
     private Channel channel;
     private boolean disconnected;
+
+    public NettyNetwork(NettySession session) {
+        this.session = session;
+    }
 
     public void sendPacket(NettyPacket packet) {
         if (this.channel == null) return;
@@ -24,7 +30,13 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     }
 
     private void sendPacketInternal(NettyPacket packet) {
-        this.channel.writeAndFlush(packet);
+        this.channel.writeAndFlush(packet).addListener(future -> {
+            if (future.isSuccess()) {
+                packet.write(this);
+            } else {
+                this.exceptionCaught(null, future.cause());
+            }
+        });
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
@@ -68,7 +80,9 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
             return;
         }
 
+        System.out.println("ACTIVE");
         this.channel = ctx.channel();
+        this.session.channelActive();
     }
 
     @Override
@@ -79,8 +93,8 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, NettyPacket nettyPacket) {
-
+    protected void channelRead0(ChannelHandlerContext context, NettyPacket packet) {
+        packet.read(this);
     }
 
     public boolean isConnected() {
