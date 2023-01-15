@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
@@ -21,6 +22,12 @@ repositories {
 
 
 dependencies {
+    implementation 'io.netty:netty-all:4.0.23.Final'
+
     compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+}
+
+artifacts {
+    archives shadowJar
 }
