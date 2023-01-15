@@ -9,8 +9,8 @@ import java.util.Map;
 public enum EnumPacketRegistry {
     TOKEN_PACKET(0x00,TokenPacket .class, TokenPacket::new);
 
-    public static final Map<Integer, PacketConstructor<? extends NettyPacket>> ENCODER_PACKETS = new HashMap<>();
-    public static final  Map<Class<? extends NettyPacket>, Integer> DECODER_PACKETS = new HashMap<>();
+    public static final Map<Integer, PacketConstructor<? extends NettyPacket>> DECODER_PACKET = new HashMap<>();
+    public static final  Map<Class<? extends NettyPacket>, Integer> ENCODER_PACKETS = new HashMap<>();
 
     static {
         for (EnumPacketRegistry value : values()) {
@@ -44,10 +44,10 @@ public enum EnumPacketRegistry {
         }
 
         if (client) {
-            ENCODER_PACKETS.put(this.packetId, this.constructor);
+            DECODER_PACKET.put(this.packetId, this.constructor);
         }
         if (server) {
-            DECODER_PACKETS.put(this.packetClass, this.packetId);
+            ENCODER_PACKETS.put(this.packetClass, this.packetId);
         }
     }
 
