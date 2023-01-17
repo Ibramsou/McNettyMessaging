@@ -10,6 +10,7 @@ import io.netty.handler.timeout.WriteTimeoutException;
 
 import java.net.ConnectException;
 
+@ChannelHandler.Sharable
 public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> implements TaskHandler {
 
     private final NettySession session;
@@ -73,7 +74,9 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
 
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) {
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+
         if (this.disconnected || this.channel != null) {
             ctx.channel().close();
             return;
@@ -83,8 +86,12 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         this.session.connected();
     }
 
+
+
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        super.channelInactive(ctx);
+
         if (ctx.channel() == this.channel) {
             this.disconnect(DisconnectReason.HOST_DISCONNECTED, null);
         }

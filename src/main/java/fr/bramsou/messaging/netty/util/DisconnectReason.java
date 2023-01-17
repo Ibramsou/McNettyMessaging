@@ -5,7 +5,8 @@ public enum DisconnectReason {
     CONNECTION_TIMED_OUT("Connection timed out"),
     READ_TIMED_OUT("Read timed out"),
     WRITE_TIMED_OUT("Write timed out"),
-    EXCEPTION_CAUGHT("An error occurred while disconnecting");
+    EXCEPTION_CAUGHT("An error occurred while disconnecting"),
+    UNKNOWN("Unknown reason...");
 
     private final String message;
 

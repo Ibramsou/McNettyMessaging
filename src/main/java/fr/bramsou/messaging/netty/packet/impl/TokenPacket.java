@@ -1,5 +1,8 @@
 package fr.bramsou.messaging.netty.packet.impl;
 
+import fr.bramsou.messaging.netty.NettyEncryption;
+import fr.bramsou.messaging.netty.NettyNetwork;
+import fr.bramsou.messaging.netty.NettyOptions;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
@@ -14,12 +17,19 @@ public class TokenPacket implements NettyPacket {
     }
 
     public TokenPacket(PacketBuffer buffer) {
-        this.token = buffer.readString(16);
+        this.token = NettyEncryption.decrypt(buffer.readString(Short.MAX_VALUE));
     }
 
     @Override
     public void serialize(PacketBuffer buffer) {
-        buffer.writeString(this.token);
+        buffer.writeString(NettyEncryption.encrypt(this.token));
+    }
+
+    @Override
+    public void read(NettyNetwork network) {
+        if (NettyOptions.VERIFY_TOKEN.equals(this.token)) {
+            System.out.println("Token: " + this.token);
+        }
     }
 
     public String getToken() {
