@@ -9,8 +9,6 @@ import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
 
 import java.net.ConnectException;
-
-@ChannelHandler.Sharable
 public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> implements TaskHandler {
 
     private final NettySession session;
@@ -41,6 +39,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         });
     }
 
+    @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         DisconnectReason reason;
         if (cause instanceof ConnectTimeoutException || (cause instanceof ConnectException && cause.getMessage().contains("connection timed out"))) {
@@ -66,10 +65,10 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         this.disconnected = true;
 
         if (this.channel != null && this.channel.isOpen()) {
-            this.channel.close();
+            this.channel.flush().close();
         }
 
-        this.session.disconnected(reason, cause);
+        this.session.disconnected(this, reason, cause);
     }
 
 
@@ -83,10 +82,8 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         }
 
         this.channel = ctx.channel();
-        this.session.connected();
+        this.session.connected(this);
     }
-
-
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -98,7 +95,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext context, NettyPacket packet) {
+    protected void channelRead0(ChannelHandlerContext context, NettyPacket packet) throws Exception {
         packet.read(this);
     }
 

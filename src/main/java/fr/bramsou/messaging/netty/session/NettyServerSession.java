@@ -1,7 +1,6 @@
 package fr.bramsou.messaging.netty.session;
 
 import fr.bramsou.messaging.netty.NettyInitializer;
-import fr.bramsou.messaging.netty.NettyNetwork;
 import fr.bramsou.messaging.netty.util.AddressResolver;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -11,14 +10,12 @@ import java.net.SocketAddress;
 
 public class NettyServerSession extends NettySession {
 
-    private final NettyNetwork network = new NettyNetwork(this);
-
     public NettyServerSession bindConnection(int port) {
         final SocketAddress address = AddressResolver.resolveAddress(port);
 
         final ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.channel(SERVER_SOCKET_CHANNEL_CLASS);
-        bootstrap.childHandler(new NettyInitializer(this.network));
+        bootstrap.childHandler(new NettyInitializer(this));
         bootstrap.group(this.getEventLoopGroup());
         bootstrap.localAddress(address);
         ChannelFuture future = bootstrap.bind();
@@ -30,10 +27,5 @@ public class NettyServerSession extends NettySession {
 
         future.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         return this;
-    }
-
-    @Override
-    public NettyNetwork getNetwork() {
-        return this.network;
     }
 }

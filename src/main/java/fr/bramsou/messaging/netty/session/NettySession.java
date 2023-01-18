@@ -44,15 +44,13 @@ public abstract class NettySession {
         return EVENT_LOOP_GROUP.next();
     }
 
-    public void connected() {}
+    public void connected(NettyNetwork network) {}
 
-    public void disconnected(DisconnectReason reason, Throwable cause) {
+    public void disconnected(NettyNetwork network, DisconnectReason reason, Throwable cause) {
         if (reason == DisconnectReason.EXCEPTION_CAUGHT) {
-            throw new RuntimeException(reason.getMessage(), cause);
+            System.out.println("Disconnected for: " + cause.getMessage());
         } else {
             //TODO: Log
         }
     }
-
-    public abstract NettyNetwork getNetwork();
 }
