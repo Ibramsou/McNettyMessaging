@@ -1,6 +1,7 @@
 package fr.bramsou.messaging.netty.session;
 
 import fr.bramsou.messaging.netty.NettyInitializer;
+import fr.bramsou.messaging.netty.handler.PacketHandlerConstructor;
 import fr.bramsou.messaging.netty.util.AddressResolver;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -9,6 +10,11 @@ import io.netty.channel.ChannelFutureListener;
 import java.net.SocketAddress;
 
 public class NettyServerSession extends NettySession {
+
+
+    public NettyServerSession(PacketHandlerConstructor<?> constructor) {
+        super(constructor);
+    }
 
     public NettyServerSession bindConnection(int port) {
         final SocketAddress address = AddressResolver.resolveAddress(port);

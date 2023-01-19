@@ -9,6 +9,6 @@ public class BungeePlugin extends Plugin {
 
     @Override
     public void onEnable() {
-        this.session = new NettyServerSession().bindConnection(27777);
+        this.session = new NettyServerSession(ServerPacketHandler::new).bindConnection(27777);
     }
 }

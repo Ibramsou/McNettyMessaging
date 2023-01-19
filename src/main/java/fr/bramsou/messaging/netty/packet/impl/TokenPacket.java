@@ -1,8 +1,7 @@
 package fr.bramsou.messaging.netty.packet.impl;
 
 import fr.bramsou.messaging.netty.NettyEncryption;
-import fr.bramsou.messaging.netty.NettyNetwork;
-import fr.bramsou.messaging.netty.NettyOptions;
+import fr.bramsou.messaging.netty.handler.PacketHandler;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
@@ -26,10 +25,8 @@ public class TokenPacket implements NettyPacket {
     }
 
     @Override
-    public void read(NettyNetwork network) {
-        if (NettyOptions.VERIFY_TOKEN.equals(this.token)) {
-            System.out.println("Token: " + this.token);
-        }
+    public void read(PacketHandler handler) {
+        handler.read(this);
     }
 
     public String getToken() {

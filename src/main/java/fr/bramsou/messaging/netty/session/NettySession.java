@@ -1,9 +1,7 @@
 package fr.bramsou.messaging.netty.session;
 
-import fr.bramsou.messaging.netty.NettyNetwork;
-import fr.bramsou.messaging.netty.util.DisconnectReason;
+import fr.bramsou.messaging.netty.handler.PacketHandlerConstructor;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerSocketChannel;
@@ -35,6 +33,12 @@ public abstract class NettySession {
         }
     }
 
+    private final PacketHandlerConstructor<?> handlerConstructor;
+
+    public NettySession(PacketHandlerConstructor<?> handlerConstructor) {
+        this.handlerConstructor = handlerConstructor;
+    }
+
     protected final EventLoopGroup getEventLoopGroup() {
         if (EVENT_LOOP_GROUP == null) {
             EVENT_LOOP_GROUP = EVENT_LOOP_GROUP_SUPPLIER.get();
@@ -44,13 +48,7 @@ public abstract class NettySession {
         return EVENT_LOOP_GROUP.next();
     }
 
-    public void connected(NettyNetwork network) {}
-
-    public void disconnected(NettyNetwork network, DisconnectReason reason, Throwable cause) {
-        if (reason == DisconnectReason.EXCEPTION_CAUGHT) {
-            System.out.println("Disconnected for: " + cause.getMessage());
-        } else {
-            //TODO: Log
-        }
+    public final PacketHandlerConstructor<?> getHandlerConstructor() {
+        return handlerConstructor;
     }
 }

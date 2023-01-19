@@ -1,5 +1,6 @@
 package fr.bramsou.messaging.netty;
 
+import fr.bramsou.messaging.netty.handler.PacketHandler;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.session.NettySession;
 import fr.bramsou.messaging.netty.util.DisconnectReason;
@@ -14,6 +15,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     private final NettySession session;
     private Channel channel;
     private boolean disconnected;
+    private PacketHandler packetHandler;
 
     public NettyNetwork(NettySession session) {
         this.session = session;
@@ -32,7 +34,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
     private void sendPacketInternal(NettyPacket packet) {
         this.channel.writeAndFlush(packet).addListener(future -> {
             if (future.isSuccess()) {
-                packet.write(this);
+                packet.write(this.packetHandler);
             } else {
                 this.exceptionCaught(null, future.cause());
             }
@@ -68,7 +70,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
             this.channel.flush().close();
         }
 
-        this.session.disconnected(this, reason, cause);
+        this.packetHandler.disconnected(reason, cause);
     }
 
 
@@ -82,7 +84,8 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         }
 
         this.channel = ctx.channel();
-        this.session.connected(this);
+        this.packetHandler = this.session.getHandlerConstructor().construct(this);
+        this.packetHandler.connected();
     }
 
     @Override
@@ -96,7 +99,7 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
 
     @Override
     protected void channelRead0(ChannelHandlerContext context, NettyPacket packet) throws Exception {
-        packet.read(this);
+        packet.read(this.packetHandler);
     }
 
     public boolean isConnected() {

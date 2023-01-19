@@ -9,6 +9,6 @@ public class BukkitPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.session = new NettyClientSession().createConnection(27777);
+        this.session = new NettyClientSession(ClientPacketHandler::new).createConnection(27777);
     }
 }
