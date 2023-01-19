@@ -17,7 +17,7 @@ public class ClientPacketHandler implements PacketHandler {
 
     @Override
     public void connected() {
-        this.network.sendPacket(new TokenPacket(NettyOptions.VERIFY_TOKEN));
+        this.network.sendPacket(new TokenPacket(NettyOptions.VERIFY_TOKEN, Bukkit.getPort()));
     }
 
     @Override

@@ -6,6 +6,8 @@ public enum DisconnectReason {
     READ_TIMED_OUT("Read timed out"),
     WRITE_TIMED_OUT("Write timed out"),
     EXCEPTION_CAUGHT("An error occurred while disconnecting"),
+    UNKNOWN_SERVER("BungeeCord cannot recognize this server"),
+    INCORRECT_TOKEN("Token password doesn't match"),
     UNKNOWN("Unknown reason...");
 
     private final String message;

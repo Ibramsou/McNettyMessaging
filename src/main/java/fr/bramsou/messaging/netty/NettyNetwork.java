@@ -102,6 +102,10 @@ public class NettyNetwork extends SimpleChannelInboundHandler<NettyPacket> imple
         packet.read(this.packetHandler);
     }
 
+    public void close(DisconnectReason reason) {
+        this.disconnect(reason, null);
+    }
+
     public boolean isConnected() {
         return !this.disconnected && this.channel != null && this.channel.isOpen();
     }
