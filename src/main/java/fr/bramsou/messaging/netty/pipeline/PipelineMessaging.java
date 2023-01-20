@@ -24,7 +24,7 @@ public class PipelineMessaging extends ByteToMessageCodec<NettyPacket> {
             packet.serialize(buffer);
         } catch (Throwable t) {
             out.writerIndex(initial);
-            throw new RuntimeException("Unable to encode packet " + packet.getClass().getSimpleName(), t);
+            throw new RuntimeException("Unable to encode packet " + packet.getClass().getSimpleName(), t.getCause());
         }
     }
 
