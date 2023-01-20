@@ -2,7 +2,6 @@ package fr.bramsou.messaging.netty.registry;
 
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.impl.CompressionPacket;
-import fr.bramsou.messaging.netty.packet.impl.TestPacket;
 import fr.bramsou.messaging.netty.packet.impl.TokenPacket;
 
 import java.util.HashMap;
