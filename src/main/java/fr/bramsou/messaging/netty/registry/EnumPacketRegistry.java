@@ -1,13 +1,16 @@
 package fr.bramsou.messaging.netty.registry;
 
 import fr.bramsou.messaging.netty.packet.NettyPacket;
+import fr.bramsou.messaging.netty.packet.impl.CompressionPacket;
+import fr.bramsou.messaging.netty.packet.impl.TestPacket;
 import fr.bramsou.messaging.netty.packet.impl.TokenPacket;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum EnumPacketRegistry {
-    TOKEN_PACKET(0x00, TokenPacket .class, TokenPacket::new);
+    TOKEN_PACKET(0x00, TokenPacket.class, TokenPacket::new),
+    COMPRESSION_PACKET(0x01, CompressionPacket.class, CompressionPacket::new);
 
     public static final Map<Integer, PacketConstructor<? extends NettyPacket>> DECODER_PACKET = new HashMap<>();
     public static final  Map<Class<? extends NettyPacket>, Integer> ENCODER_PACKETS = new HashMap<>();
