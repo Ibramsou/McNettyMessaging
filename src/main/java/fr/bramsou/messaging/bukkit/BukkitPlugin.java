@@ -1,7 +1,7 @@
 package fr.bramsou.messaging.bukkit;
 
 import fr.bramsou.messaging.netty.NettyNetwork;
-import fr.bramsou.messaging.netty.NettyOptions;
+
 import fr.bramsou.messaging.netty.handler.PacketListenerHandler;
 import fr.bramsou.messaging.netty.packet.impl.TokenPacket;
 import fr.bramsou.messaging.netty.registry.PacketRegistryState;
@@ -26,6 +26,7 @@ public class BukkitPlugin extends JavaPlugin {
 
         @Override
         public void connected(NettyNetwork network) {
+            System.out.println("CONNECTED !");
             network.sendPacket(new TokenPacket("Password123", Bukkit.getPort()));
         }
 
@@ -33,12 +34,14 @@ public class BukkitPlugin extends JavaPlugin {
         public void disconnected(NettyNetwork network, DisconnectReason reason, Throwable cause) {
             final String message = reason == DisconnectReason.EXCEPTION_CAUGHT ? cause.getMessage() : reason.getMessage();
             Bukkit.getLogger().info("Server closed for: " + message);
-            cause.printStackTrace();
         }
     };
 
     @Override
     public void onEnable() {
-        new NettyClientSession(this.listener).createConnection("localhost", 27777);
+        final NettyClientSession session = new NettyClientSession(this.listener);
+        session.setAutoReconnect(true);
+        session.setReconnectTime(5000);
+        session.createConnection("localhost", 27777);
     }
 }
