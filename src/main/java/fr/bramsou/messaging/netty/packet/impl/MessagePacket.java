@@ -2,12 +2,12 @@ package fr.bramsou.messaging.netty.packet.impl;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import fr.bramsou.messaging.netty.handler.PacketHandler;
+import fr.bramsou.messaging.netty.handler.MessagingPacketListenerHandler;
 import fr.bramsou.messaging.netty.util.MessageType;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
-public class MessagePacket implements NettyPacket {
+public class MessagePacket implements NettyPacket<MessagingPacketListenerHandler> {
 
     private final MessageType type;
     private final Object message;
@@ -40,7 +40,7 @@ public class MessagePacket implements NettyPacket {
     }
 
     @Override
-    public void read(PacketHandler handler) {
+    public void read(MessagingPacketListenerHandler handler) {
         if (this.message instanceof JsonObject) {
             handler.handleJson((JsonObject) this.message);
         } else {

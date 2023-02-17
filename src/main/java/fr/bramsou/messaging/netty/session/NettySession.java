@@ -1,6 +1,5 @@
 package fr.bramsou.messaging.netty.session;
 
-import fr.bramsou.messaging.netty.handler.PacketHandlerConstructor;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -12,6 +11,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.function.Supplier;
 
 public abstract class NettySession {
@@ -33,13 +36,7 @@ public abstract class NettySession {
         }
     }
 
-    private final PacketHandlerConstructor<?> handlerConstructor;
-
-    public NettySession(PacketHandlerConstructor<?> handlerConstructor) {
-        this.handlerConstructor = handlerConstructor;
-    }
-
-    protected final EventLoopGroup getEventLoopGroup() {
+    protected static EventLoopGroup getEventLoopGroup() {
         if (EVENT_LOOP_GROUP == null) {
             EVENT_LOOP_GROUP = EVENT_LOOP_GROUP_SUPPLIER.get();
             return EVENT_LOOP_GROUP;
@@ -48,7 +45,26 @@ public abstract class NettySession {
         return EVENT_LOOP_GROUP.next();
     }
 
-    public final PacketHandlerConstructor<?> getHandlerConstructor() {
-        return handlerConstructor;
+    protected static SocketAddress resolveAddress(String host, int port) {
+        InetSocketAddress address;
+        try {
+            final InetAddress resolved = InetAddress.getByName(host);
+            address = new InetSocketAddress(resolved, port);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            address = InetSocketAddress.createUnresolved(host, port);
+        }
+
+        return address;
+    }
+
+    private final NettySessionListener listener;
+
+    public NettySession(NettySessionListener listener) {
+        this.listener = listener;
+    }
+
+    public final NettySessionListener getListener() {
+        return listener;
     }
 }

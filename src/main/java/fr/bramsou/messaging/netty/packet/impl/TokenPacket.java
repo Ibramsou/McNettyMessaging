@@ -1,13 +1,13 @@
 package fr.bramsou.messaging.netty.packet.impl;
 
 import fr.bramsou.messaging.netty.NettyEncryption;
-import fr.bramsou.messaging.netty.handler.PacketHandler;
+import fr.bramsou.messaging.netty.handler.MessagingPacketListenerHandler;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
 import java.util.Objects;
 
-public class TokenPacket implements NettyPacket {
+public class TokenPacket implements NettyPacket<MessagingPacketListenerHandler> {
 
     private final String token;
     private final int port;
@@ -29,8 +29,8 @@ public class TokenPacket implements NettyPacket {
     }
 
     @Override
-    public void read(PacketHandler handler) {
-        handler.read(this);
+    public void read(MessagingPacketListenerHandler handler) {
+        handler.handle(this);
     }
 
     public String getToken() {

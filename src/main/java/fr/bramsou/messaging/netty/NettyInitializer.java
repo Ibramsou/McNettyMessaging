@@ -1,6 +1,6 @@
 package fr.bramsou.messaging.netty;
 
-import fr.bramsou.messaging.netty.pipeline.PipelineMessaging;
+import fr.bramsou.messaging.netty.pipeline.PipelineCodec;
 import fr.bramsou.messaging.netty.pipeline.PipelineSizer;
 import fr.bramsou.messaging.netty.session.NettySession;
 import io.netty.channel.*;
@@ -27,7 +27,7 @@ public class NettyInitializer extends ChannelInitializer<Channel> {
         final NettyNetwork network = new NettyNetwork(this.session);
 
         pipeline.addLast("sizer", new PipelineSizer());
-        pipeline.addLast("codec", new PipelineMessaging());
+        pipeline.addLast("codec", new PipelineCodec(network));
         pipeline.addLast("manager", network);
     }
 }

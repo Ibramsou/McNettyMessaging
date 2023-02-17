@@ -1,12 +1,14 @@
 package fr.bramsou.messaging.netty.packet.impl;
 
-import fr.bramsou.messaging.netty.handler.PacketHandler;
+import fr.bramsou.messaging.netty.NettyNetwork;
+import fr.bramsou.messaging.netty.NettyOptions;
+import fr.bramsou.messaging.netty.handler.MessagingPacketListenerHandler;
 import fr.bramsou.messaging.netty.packet.NettyPacket;
 import fr.bramsou.messaging.netty.packet.PacketBuffer;
 
 import java.util.Objects;
 
-public class CompressionPacket implements NettyPacket {
+public class CompressionPacket implements NettyPacket<MessagingPacketListenerHandler> {
 
     private final int threshold;
 
@@ -24,13 +26,14 @@ public class CompressionPacket implements NettyPacket {
     }
 
     @Override
-    public void read(PacketHandler handler) {
-        handler.read(this);
+    public void read(MessagingPacketListenerHandler handler) {
+        handler.getNetwork().setCompressionThreshold(this.threshold);
+        handler.handle(this);
     }
 
     @Override
-    public void write(PacketHandler handler) {
-        handler.write(this);
+    public void write(NettyNetwork network) {
+        network.setCompressionThreshold(NettyOptions.COMPRESSION_THRESHOLD);
     }
 
     public int getThreshold() {
