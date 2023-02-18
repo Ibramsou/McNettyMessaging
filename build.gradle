@@ -8,25 +8,13 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    maven {
-        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
-    }
-    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
 }
 
 
 dependencies {
     implementation 'io.netty:netty-all:4.0.23.Final'
-
-    compileOnly 'org.apache.commons:commons-lang3:3.3.2'
-    compileOnly 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
-    compileOnly 'net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT'
+    implementation 'org.apache.commons:commons-lang3:3.3.2'
+    implementation 'com.google.code.gson:gson:2.8.2'
 }
 
 artifacts {
