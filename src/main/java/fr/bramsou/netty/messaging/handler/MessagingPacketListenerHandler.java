@@ -2,6 +2,8 @@ package fr.bramsou.netty.messaging.handler;
 
 import com.google.gson.JsonObject;
 import fr.bramsou.netty.messaging.packet.impl.CompressionPacket;
+import fr.bramsou.netty.messaging.packet.impl.JsonMessagePacket;
+import fr.bramsou.netty.messaging.packet.impl.MessagePacket;
 import fr.bramsou.netty.messaging.packet.impl.TokenPacket;
 
 public interface MessagingPacketListenerHandler extends PacketListenerHandler {
@@ -10,7 +12,7 @@ public interface MessagingPacketListenerHandler extends PacketListenerHandler {
 
     default void handle(CompressionPacket packet) {}
 
-    default void handleMessage(String message) {}
+    default void handle(MessagePacket packet) {}
 
-    default void handleJson(JsonObject object) {}
+    default void handle(JsonMessagePacket packet) {}
 }
