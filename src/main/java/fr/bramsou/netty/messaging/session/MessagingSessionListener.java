@@ -23,5 +23,5 @@ public interface MessagingSessionListener {
 
     void connected(MessagingNetwork network);
 
-    void disconnected(MessagingNetwork network, DisconnectReason reason, Throwable cause);
+    void disconnected(MessagingNetwork network, String reason, Throwable cause);
 }

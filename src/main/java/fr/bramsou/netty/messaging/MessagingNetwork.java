@@ -69,14 +69,18 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
             reason = DisconnectReason.EXCEPTION_CAUGHT;
         }
 
-        this.disconnect(reason, cause);
+        this.disconnect(reason.getMessage(), cause);
     }
 
     public void disconnect(DisconnectReason reason) {
-        this.disconnect(reason, null);
+        this.disconnect(reason.getMessage(), null);
     }
 
     public void disconnect(DisconnectReason reason, Throwable cause) {
+        this.disconnect(reason.getMessage(), cause);
+    }
+
+    public void disconnect(String reason, Throwable cause) {
         if (this.disconnected) return;
 
         this.disconnected = true;
