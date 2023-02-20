@@ -1,15 +1,25 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
+    id 'maven-publish'
+    id 'signing'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'io.github.ibramsou'
+version '1.0.0'
 
 repositories {
     mavenCentral()
 }
 
+
+jar {
+    baseName = 'mc-netty-messaging'
+}
+
+shadowJar {
+    baseName = 'mc-netty-messaging'
+}
 
 dependencies {
     implementation 'io.netty:netty-all:4.0.23.Final'
@@ -17,6 +27,62 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
 }
 
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 artifacts {
     archives shadowJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = 'io.github.ibramsou'
+            artifactId = 'mc-netty-messaging-all'
+            version = '1.0.0'
+            from components.java
+
+            pom {
+                name = 'McNettyMessaging'
+                description = 'Mc Netty Messaging is a open-source Java Library used to interract between a Client <-> Server'
+                url = 'https://github.com/Ibramsou/McNettyMessaging'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Bramsou'
+                        name = 'Ibrahim'
+                        email = 'braimsou@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git:github.com/Ibramsou/McNettyMessaging.git'
+                    developerConnection = 'scm:git:ssh://github.com:Ibramsou/McNettyMessaging.git'
+                    url = 'https://github.com/Ibramsou/McNettyMessaging'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "OSSRH"
+            url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+            credentials {
+                username sonatypeUsername
+                password sonatypePassword
+            }
+        }
+    }
+}
+
+
+signing {
+    sign publishing.publications.mavenJava
 }

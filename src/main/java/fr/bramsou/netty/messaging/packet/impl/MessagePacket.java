@@ -1,9 +1,6 @@
 package fr.bramsou.netty.messaging.packet.impl;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import fr.bramsou.netty.messaging.handler.MessagingPacketListenerHandler;
-import fr.bramsou.netty.messaging.util.MessageType;
 import fr.bramsou.netty.messaging.packet.MessagingPacket;
 import fr.bramsou.netty.messaging.packet.PacketBuffer;
 
