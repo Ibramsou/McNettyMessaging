@@ -41,7 +41,7 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket<?>> {
         if (in.readableBytes() != 0) {
             PacketBuffer buffer = new PacketBuffer(in);
             final int packetId = buffer.readVarInt();
-            final PacketFactory<? extends MessagingPacket<?>> constructor = PacketRegistry.getInstance().getPacketFactory(this.network.getState(), packetId, !MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS);
+            final PacketFactory<? extends MessagingPacket<?>> constructor = PacketRegistry.getInstance().getPacketFactory(this.network.getState(), packetId, MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS);
 
             if (constructor == null) {
                 in.skipBytes(buffer.readableBytes());
