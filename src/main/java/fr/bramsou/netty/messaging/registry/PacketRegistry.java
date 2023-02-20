@@ -41,11 +41,18 @@ public class PacketRegistry {
         }
     }
 
-    public PacketFactory<? extends MessagingPacket<?>> getPacketFactory(PacketRegistryState state, int id, PacketBuffer buffer) {
+    public PacketFactory<? extends MessagingPacket<?>> getPacketFactory(PacketRegistryState state, int id, boolean throwError) {
         final Map<Integer, PacketFactory<? extends MessagingPacket<?>>> map = this.stateIdPacketMap.get(state);
         if (map == null) throw new IllegalArgumentException(state.getName() + " state is not registered in packet registry !");
         final PacketFactory<? extends MessagingPacket<?>> constructor = map.get(id);
-        if (constructor == null) throw new IllegalArgumentException("Packet #" + id + " is not a registered packet on " + state.getName() + " state !");
+        if (constructor == null) {
+            if (throwError) {
+                throw new IllegalArgumentException("Packet #" + id + " is not a registered packet on " + state.getName() + " state !");
+            }
+
+            return null;
+        }
+
         return constructor;
     }
 

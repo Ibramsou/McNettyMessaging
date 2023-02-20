@@ -1,6 +1,7 @@
 package fr.bramsou.netty.messaging.pipeline;
 
 import fr.bramsou.netty.messaging.MessagingNetwork;
+import fr.bramsou.netty.messaging.MessagingOptions;
 import fr.bramsou.netty.messaging.packet.MessagingPacket;
 import fr.bramsou.netty.messaging.packet.PacketBuffer;
 import fr.bramsou.netty.messaging.registry.PacketFactory;
@@ -40,7 +41,7 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket<?>> {
         if (in.readableBytes() != 0) {
             PacketBuffer buffer = new PacketBuffer(in);
             final int packetId = buffer.readVarInt();
-            final PacketFactory<? extends MessagingPacket<?>> constructor = PacketRegistry.getInstance().getPacketFactory(this.network.getState(), packetId, buffer);
+            final PacketFactory<? extends MessagingPacket<?>> constructor = PacketRegistry.getInstance().getPacketFactory(this.network.getState(), packetId, !MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS);
 
             if (constructor == null) {
                 in.skipBytes(buffer.readableBytes());
