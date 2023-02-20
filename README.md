@@ -97,4 +97,4 @@ And then connect to server
 session.createConnection("localhost", 27777);
 ```
 
-### Here is a plugin with an exemple of custom packet state create: https://github.com/Ibramsou/ProxyMessaging
+### Here is a plugin with an exemple of custom packet state creation: https://github.com/Ibramsou/ProxyMessaging
