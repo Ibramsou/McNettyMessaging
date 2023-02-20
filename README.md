@@ -1,5 +1,5 @@
 # McNettyMessaging
-Messaging system using netty. Serviceable on minecraft between Spigot &lt;-> Proxy or any other usages
+Messaging system using netty. Serviceable on minecraft between Spigot &lt;-> Proxy and any other usages
 # Implementation
 ### Gradle
 ```gradle
