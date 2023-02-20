@@ -23,7 +23,7 @@ dependencies {
 ```
 # How to use
 ### Step 1: Create packet listener handler
-The packet listener handle is needed when incoming packets are received.
+The packet listener handler is needed when incoming packets are received.
 ```java
 public class PacketListener implements MessagingPacketListenerHandler {
 
