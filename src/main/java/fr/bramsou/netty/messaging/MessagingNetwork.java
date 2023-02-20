@@ -80,6 +80,10 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
         this.disconnect(reason.getMessage(), cause);
     }
 
+    public void disconnect(String reason) {
+        this.disconnect(reason, null);
+    }
+
     public void disconnect(String reason, Throwable cause) {
         if (this.disconnected) return;
 
