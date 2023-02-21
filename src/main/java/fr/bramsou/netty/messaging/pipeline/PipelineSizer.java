@@ -14,7 +14,7 @@ public class PipelineSizer extends ByteToMessageCodec<ByteBuf> {
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
         int length = in.readableBytes();
-        int lengthSize = PacketBuffer.getLengthSize(length);
+        int lengthSize = PacketBuffer.getVarIntSize(length);
         if (lengthSize > 3) {
             throw new IllegalArgumentException("unable to fit " + length + " into " + 3);
         } else {
