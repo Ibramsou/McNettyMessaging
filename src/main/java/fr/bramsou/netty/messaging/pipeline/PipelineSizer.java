@@ -1,5 +1,6 @@
 package fr.bramsou.netty.messaging.pipeline;
 
+import fr.bramsou.netty.messaging.MessagingNetwork;
 import fr.bramsou.netty.messaging.packet.PacketBuffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,7 +10,9 @@ import io.netty.handler.codec.CorruptedFrameException;
 
 import java.util.List;
 
-public class PipelineSizer extends ByteToMessageCodec<ByteBuf> {
+public class PipelineSizer extends ByteToMessageCodec<ByteBuf>  {
+
+    public PipelineSizer(MessagingNetwork ignored) {}
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {

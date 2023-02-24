@@ -1,9 +1,9 @@
 package fr.bramsou.netty.messaging;
 
-import fr.bramsou.netty.messaging.pipeline.PipelineCodec;
-import fr.bramsou.netty.messaging.pipeline.PipelineSizer;
 import fr.bramsou.netty.messaging.session.MessagingSession;
 import io.netty.channel.*;
+
+import java.net.InetSocketAddress;
 
 public class MessagingInitializer extends ChannelInitializer<Channel> {
 
@@ -15,19 +15,18 @@ public class MessagingInitializer extends ChannelInitializer<Channel> {
 
     @Override
     protected void initChannel(Channel channel) {
-        channel.config().setOption(ChannelOption.IP_TOS, 0x18);
-
-        try {
-            channel.config().setOption(ChannelOption.TCP_NODELAY, true);
-        } catch (ChannelException e) {
-            throw new IllegalArgumentException("Exception while trying to set TCP_NODELAY", e);
+        InetSocketAddress address = (InetSocketAddress) channel.localAddress();
+        if (this.session.getBuilder().isAuthorizeIncomingAddress() || address.getHostName().equals("127.0.0.1")) {
+            this.session.getBuilder().getChannelOptions().forEach((option, value) -> channel.config().setOption(option, value));
+            final ChannelPipeline pipeline = channel.pipeline();
+            final MessagingNetwork network = new MessagingNetwork(this.session);
+            this.session.getBuilder().getPipelineHandlers().stream().filter(entry -> !entry.afterNetwork)
+                    .forEach(entry-> pipeline.addLast(entry.id, entry.constructor.construct(network)));
+            pipeline.addLast("manager", network);
+            this.session.getBuilder().getPipelineHandlers().stream().filter(entry -> entry.afterNetwork)
+                    .forEach(entry -> pipeline.addLast(entry.id, entry.constructor.construct(network)));
+        } else {
+            channel.flush().close();
         }
-
-        final ChannelPipeline pipeline = channel.pipeline();
-        final MessagingNetwork network = new MessagingNetwork(this.session);
-
-        pipeline.addLast("sizer", new PipelineSizer());
-        pipeline.addLast("codec", new PipelineCodec(network));
-        pipeline.addLast("manager", network);
     }
 }

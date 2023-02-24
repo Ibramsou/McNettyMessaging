@@ -1,5 +1,9 @@
 package fr.bramsou.netty.messaging.session;
 
+import fr.bramsou.netty.messaging.MessagingBuilder;
+import fr.bramsou.netty.messaging.MessagingInitializer;
+import io.netty.bootstrap.AbstractBootstrap;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -59,12 +63,38 @@ public abstract class MessagingSession {
     }
 
     private final MessagingSessionListener listener;
+    private final MessagingBuilder builder;
 
-    public MessagingSession(MessagingSessionListener listener) {
+    public MessagingSession(MessagingSessionListener listener, MessagingBuilder builder) {
         this.listener = listener;
+        this.builder = builder;
+    }
+
+    protected final void configureBootstrap(AbstractBootstrap<?, ?> bootstrap) {
+        if (builder.getEventLoopGroup() == null) {
+            bootstrap.group(getEventLoopGroup());
+        } else {
+            bootstrap.group(builder.getEventLoopGroup().get());
+        }
+        this.builder.getBootstrapOptions().forEach(bootstrap::option);
+    }
+
+    protected final void configureConnection(ChannelFuture future) {
+        this.builder.getListeners().forEach(future::addListener);
+        if (this.builder.isSynchronizeWait()) {
+            try {
+                future.sync();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public final MessagingSessionListener getListener() {
         return listener;
+    }
+
+    public MessagingBuilder getBuilder() {
+        return builder;
     }
 }
