@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.ibramsou:mc-netty-messaging-all:1.0.0'
+    implementation 'io.github.ibramsou:mc-netty-messaging-all:VERSION'
 }
 ```
 ### Maven
@@ -17,7 +17,7 @@ dependencies {
     <dependency>
         <groupId>io.github.ibramsou</groupId>
         <artifactId>mc-netty-messaging-all</artifactId>
-        <version>1.0.0</version>
+        <version>VERSION</version>
     </dependency>
 </dependencies>
 ```
