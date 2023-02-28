@@ -19,6 +19,9 @@ public class MessagingServerSession extends MessagingSession {
         super(listener, builder);
     }
 
+    @Override
+    public void disconnect() {}
+
     public void bindConnection(String host, int port) {
         final SocketAddress address = resolveAddress(host, port);
 

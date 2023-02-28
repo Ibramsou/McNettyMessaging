@@ -93,6 +93,7 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
             this.channel.flush().close();
         }
 
+        this.session.disconnect();
         this.session.getListener().disconnected(this, reason, cause);
     }
 

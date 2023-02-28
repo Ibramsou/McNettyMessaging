@@ -1,7 +1,7 @@
 package fr.bramsou.netty.messaging.session;
 
 import fr.bramsou.netty.messaging.MessagingBuilder;
-import fr.bramsou.netty.messaging.MessagingInitializer;
+import fr.bramsou.netty.messaging.MessagingOptions;
 import io.netty.bootstrap.AbstractBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
@@ -64,11 +64,15 @@ public abstract class MessagingSession {
 
     private final MessagingSessionListener listener;
     private final MessagingBuilder builder;
+    private String host;
+    private int port;
 
     public MessagingSession(MessagingSessionListener listener, MessagingBuilder builder) {
         this.listener = listener;
         this.builder = builder;
     }
+
+    public abstract void disconnect();
 
     protected final void configureBootstrap(AbstractBootstrap<?, ?> bootstrap) {
         if (builder.getEventLoopGroup() == null) {
@@ -88,6 +92,22 @@ public abstract class MessagingSession {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public final MessagingSessionListener getListener() {
