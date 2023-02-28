@@ -4,14 +4,10 @@ import fr.bramsou.netty.messaging.pipeline.PipelineFactory;
 import fr.bramsou.netty.messaging.pipeline.PipelineCodec;
 import fr.bramsou.netty.messaging.pipeline.PipelineSizer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.socket.ServerSocketChannel;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class MessagingBuilder {
 
@@ -23,9 +19,7 @@ public class MessagingBuilder {
             .pipelineHandler("codec", PipelineCodec::new)
             .synchronize(false);
 
-    private Class<? extends SocketChannel> socketChannel;
-    private Class<? extends ServerSocketChannel> serverSocketChannel;
-    private Supplier<EventLoopGroup> eventLoopGroup;
+    private MessagingLoopGroup loopGroup;
     private final LinkedList<PipelineEntry> handlers = new LinkedList<>();
     private final Map<ChannelOption<Object>, Object> bootstrapOptions = new LinkedHashMap<>();
     private final Map<ChannelOption<Object>, Object> channelOptions = new LinkedHashMap<>();
@@ -34,18 +28,8 @@ public class MessagingBuilder {
     private boolean synchronizeWait;
     private boolean authorizeIncomingAddress = true;
 
-    public MessagingBuilder socketChannel(Class<? extends SocketChannel> channel) {
-        this.socketChannel = channel;
-        return this;
-    }
-
-    public MessagingBuilder serverSocketChannel(Class<? extends ServerSocketChannel> channel) {
-        this.serverSocketChannel = channel;
-        return this;
-    }
-
-    public MessagingBuilder eventLoopGroup(Supplier<EventLoopGroup> eventLoopGroup) {
-        this.eventLoopGroup = eventLoopGroup;
+    public MessagingBuilder loopGroup(MessagingLoopGroup group) {
+        this.loopGroup = group;
         return this;
     }
 
@@ -100,18 +84,6 @@ public class MessagingBuilder {
         return synchronizeWait;
     }
 
-    public Supplier<EventLoopGroup> getEventLoopGroup() {
-        return eventLoopGroup;
-    }
-
-    public Class<? extends SocketChannel> getSocketChannel() {
-        return socketChannel;
-    }
-
-    public Class<? extends ServerSocketChannel> getServerSocketChannel() {
-        return serverSocketChannel;
-    }
-
     public Collection<PipelineEntry> getPipelineHandlers() {
         return this.handlers;
     }
@@ -130,6 +102,11 @@ public class MessagingBuilder {
 
     public boolean isAuthorizeIncomingAddress() {
         return authorizeIncomingAddress;
+    }
+
+    public MessagingLoopGroup getLoopGroup() {
+        if (loopGroup == null) return MessagingLoopGroup.DEFAULT_LOOP_GROUP;
+        return loopGroup;
     }
 
     protected static final class PipelineEntry {

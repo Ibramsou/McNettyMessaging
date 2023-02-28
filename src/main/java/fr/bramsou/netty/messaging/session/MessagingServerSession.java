@@ -2,10 +2,10 @@ package fr.bramsou.netty.messaging.session;
 
 import fr.bramsou.netty.messaging.MessagingBuilder;
 import fr.bramsou.netty.messaging.MessagingInitializer;
+import fr.bramsou.netty.messaging.MessagingLoopGroup;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelOption;
 
 import java.net.SocketAddress;
 
@@ -23,14 +23,16 @@ public class MessagingServerSession extends MessagingSession {
     public void disconnect() {}
 
     public void bindConnection(String host, int port) {
-        final SocketAddress address = resolveAddress(host, port);
+        final SocketAddress address = this.resolveAddress(host, port);
 
-        final ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.channel(this.getBuilder().getServerSocketChannel() == null ? SERVER_SOCKET_CHANNEL_CLASS : this.getBuilder().getServerSocketChannel());
-        bootstrap.childHandler(new MessagingInitializer(this));
+        final ServerBootstrap bootstrap = new ServerBootstrap()
+                .channel(MessagingLoopGroup.SERVER_SOCKET_CHANNEL_CLASS)
+                .group(this.getBuilder().getLoopGroup().getServerLoopGroup())
+                .childHandler(new MessagingInitializer(this))
+                .localAddress(address);
+
         this.configureBootstrap(bootstrap);
-        bootstrap.localAddress(address);
-        ChannelFuture future = bootstrap.bind();
+        final ChannelFuture future = bootstrap.bind();
         future.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         this.configureConnection(future);
     }

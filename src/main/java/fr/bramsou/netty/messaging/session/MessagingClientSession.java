@@ -2,6 +2,7 @@ package fr.bramsou.netty.messaging.session;
 
 import fr.bramsou.netty.messaging.MessagingBuilder;
 import fr.bramsou.netty.messaging.MessagingInitializer;
+import fr.bramsou.netty.messaging.MessagingLoopGroup;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 
@@ -35,13 +36,16 @@ public class MessagingClientSession extends MessagingSession {
     }
 
     public void createConnection(String host, int port) {
-        final Bootstrap bootstrap = new Bootstrap();
-        bootstrap.channel(this.getBuilder().getSocketChannel() == null ? SOCKET_CHANNEL_CLASS : this.getBuilder().getSocketChannel());
-        bootstrap.handler(new MessagingInitializer(this));
+        final SocketAddress address = this.resolveAddress(host, port);
+
+        final Bootstrap bootstrap = new Bootstrap()
+                .channel(MessagingLoopGroup.SOCKET_CHANNEL_CLASS)
+                .group(this.getBuilder().getLoopGroup().getClientLoopGroup())
+                .handler(new MessagingInitializer(this))
+                .localAddress("0.0.0.0", 0)
+                .remoteAddress(address);
+
         this.configureBootstrap(bootstrap);
-        final SocketAddress address = resolveAddress(host, port);
-        bootstrap.localAddress("0.0.0.0", 0);
-        bootstrap.remoteAddress(address);
         final ChannelFuture channelFuture = bootstrap.connect();
         channelFuture.addListener(future -> {
             if (!future.isSuccess()) {
