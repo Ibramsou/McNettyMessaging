@@ -8,93 +8,221 @@ repositories {
 }
 
 dependencies {
-    implementation 'io.github.ibramsou:mc-netty-messaging-all:VERSION'
+    implementation 'io.netty:netty-all:4.1.86.Final'
+    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'io.github.ibramsou:mc-netty-messaging-api:2.0.0'
+    implementation 'io.github.ibramsou:mc-netty-messaging-core:2.0.0'
 }
 ```
 ### Maven
 ```xml
 <dependencies>
     <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-all</artifactId>
+        <version>4.1.86.Final</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.9</version>
+    </dependency>
+    <dependency>
         <groupId>io.github.ibramsou</groupId>
-        <artifactId>mc-netty-messaging-all</artifactId>
-        <version>VERSION</version>
+        <artifactId>mc-netty-messaging-api</artifactId>
+        <version>2.0.0</version>
+    </dependency>
+    <dependency>
+        <groupId>io.github.ibramsou</groupId>
+        <artifactId>mc-netty-messaging-core</artifactId>
+        <version>2.0.0</version>
     </dependency>
 </dependencies>
 ```
 # How to use
-### Step 1: Create packet listener handler
-The packet listener handler is needed when incoming packets are received.
+### Step 1: Create server session
+Create a session
 ```java
-public class PacketListener implements MessagingPacketListenerHandler {
+Session session = Messaging.getInstance().createSession(SessionType.SERVER);
+```
+### Step 2: Configure session
+```java
+SessionConfig config = session.config();
+config.set(MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS, true);
+config.set(MessagingOptions.HOST, "localhost");
+config.set(MessagingOptions.PORT, 4448);
+config.set(MessagingOptions.CHANNEL, ChannelOption.TCP_NODELAY, true);
+```
+### Step 3: Open server connection
+First, create the session with the listener we created below, then handle connection with the choosen port
+```java
+session.connect();
+```
+### Step 4: Connect client session with a similar configuration
+```java
+Session session = Messaging.getInstance().createSession(SessionType.CLIENT);
+session.config().set(MessagingOptions.HOST, "localhost").set(MessagingOptions.PORT, 4448);
+session.connect();
+```
+### Step 5: Add session and packet event listeners
+```java
+session.messaging().subscribe(SessionConnectEvent.class, event -> System.out.println("Session connected !"));
+session.messaging().subscribe(MessagePacket.class, event -> event.getNetwork().sendPacket(new MessagePacket("Hello !")));
+```
+### Step 6: Create your own custom packet
+Add a new implementation
+```java
+public class TestPacket extends MessagingPacket {
 
-    private final MessagingNetwork network;
+    private final int randomInteger;
 
-    public PacketListener(MessagingNetwork network) {
-        this.network = network;
+    public TestPacket(int randomInteger) {
+        this.randomInteger = randomInteger;
+    }
+
+    public TestPacket(@Nonnull PacketBuffer buffer) {
+        this.randomInteger = buffer.readInt();
     }
 
     @Override
-    public void handle(TokenPacket packet) {
-        if (packet.getToken().equals("Password123")) {
-            System.out.println(packet.getPort() + " port has connected !");
-        } else {
-            this.network.disconnect(DisconnectReason.INCORRECT_TOKEN);
-        }
+    public void serialize(@Nonnull PacketBuffer buffer) {
+        buffer.writeInt(this.randomInteger);
     }
 
-    @Override
-    public MessagingNetwork getNetwork() {
-        return this.network;
+    public int getRandomInteger() {
+        return randomInteger;
     }
 }
 ```
-*Note: You can create your packet handler interface in relation with your own custom packets*
-### Step 2: Create session listener
-A session listener is required to store some important information which is used for the channel initialization
+Register the packet in a registered network state
 ```java
+NetworkState.DEFAULT_STATE.register(0x05, TestPacket.class, TestPacket::new);
+```
+### Step 7: Create and register your own network state
+Register the new state
+```java
+Messaging messaging = Messaging.getInstance();
+NetworkState state = messaging.getRegistry().register("Example State");
+state.register(0x01, MessagePacket.class, MessagePacket::new);
+state.register(0x02, TestPacket.class, TestPacket::new);
+```
+Set as default
+```java
+session.config().set(MessagingOptions.DEFAULT_NETWORK_STATE, state);
+```
+Or change the current network state as you want
+```java
+messaging.subscribe(TestPacket.class, event -> event.getNetwork().setState(state));
+```
 
-final MessagingSessionListener listener = new MessagingSessionListener() {
-    @Override
-    public PacketRegistryState getDefaultPacketState(MessagingNetwork network) {
-        return MESSAGING_STATE;
+# Here is a full example code
+```java
+package packet;
+
+import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
+import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
+
+import javax.annotation.Nonnull;
+
+public class TestPacket extends MessagingPacket {
+
+    private final int randomInteger;
+
+    public TestPacket(int randomInteger) {
+        this.randomInteger = randomInteger;
+    }
+
+    public TestPacket(@Nonnull PacketBuffer buffer) {
+        this.randomInteger = buffer.readInt();
     }
 
     @Override
-    public PacketListenerHandler getDefaultPacketListener(MessagingNetwork network) {
-        return new PacketListener(network);
+    public void serialize(@Nonnull PacketBuffer buffer) {
+        buffer.writeInt(this.randomInteger);
     }
 
-    @Override
-    public void connected(MessagingNetwork network) {
-        System.out.println("Connected :)");
+    public int getRandomInteger() {
+        return randomInteger;
     }
+}
+````
 
-    @Override
-    public void disconnected(MessagingNetwork network, DisconnectReason reason, Throwable cause) {
-        System.out.println("Disconnected :(");
+```java
+package server;
+
+import io.github.ibramsou.netty.messaging.api.Messaging;
+import io.github.ibramsou.netty.messaging.api.MessagingOptions;
+import io.github.ibramsou.netty.messaging.api.event.session.SessionConnectEvent;
+import io.github.ibramsou.netty.messaging.api.network.NetworkState;
+import io.github.ibramsou.netty.messaging.api.packet.impl.MessagePacket;
+import io.github.ibramsou.netty.messaging.api.session.Session;
+import io.github.ibramsou.netty.messaging.api.session.SessionConfig;
+import io.github.ibramsou.netty.messaging.api.session.SessionType;
+import io.netty.channel.ChannelOption;
+import packet.TestPacket;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+public class Server {
+
+    public static void main(String[] args) {
+        // Register custom packet to default network state
+        NetworkState.DEFAULT_STATE.register(0x05, TestPacket.class, TestPacket::new);
+        // Create a session server
+        Session session = Messaging.getInstance().createSession(SessionType.SERVER);
+        // Configure the session
+        SessionConfig config = session.config();
+        config.set(MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS, true);
+        config.set(MessagingOptions.HOST, "localhost");
+        config.set(MessagingOptions.PORT, 4448);
+        config.set(MessagingOptions.CHANNEL, ChannelOption.TCP_NODELAY, true);
+        // Register listeners
+        session.messaging().subscribe(SessionConnectEvent.class, event -> System.out.println("A client joined the server !"));
+        session.messaging().subscribe(MessagePacket.class, event -> {
+            if (event.getMessage().startsWith("Hi")) {
+                event.getNetwork().sendPacket(new TestPacket(ThreadLocalRandom.current().nextInt(400)));
+            }
+        });
+        // Open server connection
+        session.connect();
     }
-};
+}
 ```
-*Note: "MESSAGING_STATE" is a default packet state, but you can create your own, or register new packets to the default packet state*
-### Step 3: Creating server connection
-First, create the session with the listener we created below, then handle connection with the choosen port
+
 ```java
-new MessagingServerSession(this.listener).bindConnection("localhost", 27777);
-```
-### Step 4: Connect client
-First create the session
-```java
-final MessagingClientSession session = new MessagingClientSession(this.listener);
-```
-Configure it as you want
-```java
-session.setAutoReconnect(true);
-session.setReconnectTime(5000);
-session.setMaxConnectAttempts(10); // -1 = infinite
-```
-And then connect to server
-```java
-session.createConnection("localhost", 27777);
+package client;
+
+import io.github.ibramsou.netty.messaging.api.Messaging;
+import io.github.ibramsou.netty.messaging.api.MessagingOptions;
+import io.github.ibramsou.netty.messaging.api.event.session.SessionConnectEvent;
+import io.github.ibramsou.netty.messaging.api.network.NetworkState;
+import io.github.ibramsou.netty.messaging.api.packet.impl.MessagePacket;
+import io.github.ibramsou.netty.messaging.api.session.Session;
+import io.github.ibramsou.netty.messaging.api.session.SessionType;
+import io.netty.channel.ChannelOption;
+import packet.TestPacket;
+
+public class Client {
+
+    public static void main(String[] args) {
+        Messaging.getInstance().getRegistry().register("Example State");
+        // Register custom packet to default network state
+        NetworkState.DEFAULT_STATE.register(0x05, TestPacket.class, TestPacket::new);
+        // Create a session server
+        Session session = Messaging.getInstance().createSession(SessionType.CLIENT);
+        // Configure the session
+        session.config()
+                .set(MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS, true)
+                .set(MessagingOptions.HOST, "localhost")
+                .set(MessagingOptions.PORT, 4448)
+                .set(MessagingOptions.CHANNEL, ChannelOption.TCP_NODELAY, true);
+        // Register listeners
+        session.messaging().subscribe(SessionConnectEvent.class, event -> event.getNetwork().sendPacket(new MessagePacket("Hi !")));
+        session.messaging().subscribe(TestPacket.class, event -> System.out.println("Result: " + event.getRandomInteger()));
+        // Open server connection
+        session.connect();
+    }
+}
 ```
 
 ### Here is a plugin with an exemple of custom packet state creation: https://github.com/Ibramsou/ProxyMessaging
