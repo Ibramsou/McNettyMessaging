@@ -78,7 +78,7 @@ public abstract class AbstractSession implements Session {
         private final Map<Option<?>, Option<?>> optionMap = new HashMap<>();
 
         @SuppressWarnings("unchecked")
-        private  <T extends Option<?>> T getAsType(Option<?> option) {
+        private <T extends Option<?>> T getAsType(Option<?> option) {
             Option<?> result = this.optionMap.get(option);
             if (result == null) return null;
             return (T) result;
@@ -90,7 +90,6 @@ public abstract class AbstractSession implements Session {
             if (copy == null) {
                 copy = option.copy();
                 this.optionMap.put(option, copy);
-                return this;
             }
             copy.value(value);
             return this;

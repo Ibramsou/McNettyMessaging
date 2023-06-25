@@ -9,6 +9,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'signing'
+    id 'java-library'
 }
 
 allprojects {
@@ -22,15 +23,16 @@ subprojects { subproject ->
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'signing'
+    apply plugin: 'java-library'
 
     repositories {
         mavenCentral()
     }
 
     dependencies {
-        implementation 'io.netty:netty-all:4.1.86.Final'
-        implementation 'com.google.code.findbugs:annotations:3.0.1u2'
-        implementation 'com.google.code.gson:gson:2.8.9'
+        api 'io.netty:netty-all:4.1.86.Final'
+        api 'com.google.code.findbugs:annotations:3.0.1u2'
+        api 'com.google.code.gson:gson:2.8.9'
     }
 
     java {
@@ -44,11 +46,13 @@ subprojects { subproject ->
 
     publishing {
         publications {
-            mavenJava(MavenPublication) {
+            jar(MavenPublication) {
+                from components.java
                 groupId = 'io.github.ibramsou'
                 artifactId = subproject.name
                 version = project.version
-                from components.java
+
+
 
                 pom {
                     name = 'McNettyMessaging'
@@ -88,7 +92,7 @@ subprojects { subproject ->
     }
 
     signing {
-        sign publishing.publications.mavenJava
+        sign publishing.publications.jar
     }
 }
 

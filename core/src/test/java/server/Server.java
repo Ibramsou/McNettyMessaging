@@ -9,6 +9,7 @@ import io.github.ibramsou.netty.messaging.api.session.Session;
 import io.github.ibramsou.netty.messaging.api.session.SessionConfig;
 import io.github.ibramsou.netty.messaging.api.session.SessionType;
 import io.netty.channel.ChannelOption;
+import packet.TestCustomState;
 import packet.TestPacket;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -17,7 +18,7 @@ public class Server {
 
     public static void main(String[] args) {
         // Register custom packet to default network state
-        NetworkState.DEFAULT_STATE.register(0x05, TestPacket.class, TestPacket::new);
+        //NetworkState.DEFAULT_STATE.register(0x05, TestPacket.class, TestPacket::new);
         // Create a session server
         Session session = Messaging.getInstance().createSession(SessionType.SERVER);
         // Configure the session
@@ -26,6 +27,7 @@ public class Server {
         config.set(MessagingOptions.HOST, "localhost");
         config.set(MessagingOptions.PORT, 4448);
         config.set(MessagingOptions.CHANNEL, ChannelOption.TCP_NODELAY, true);
+        config.set(MessagingOptions.DEFAULT_NETWORK_STATE, TestCustomState.getCustomState());
         // Register listeners
         session.messaging().subscribe(SessionConnectEvent.class, event -> System.out.println("A client joined the server !"));
         session.messaging().subscribe(MessagePacket.class, event -> {
