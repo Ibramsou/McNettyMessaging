@@ -224,5 +224,3 @@ public class Client {
     }
 }
 ```
-
-### Here is a plugin with an exemple of custom packet state creation: https://github.com/Ibramsou/ProxyMessaging
