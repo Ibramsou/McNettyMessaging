@@ -7,7 +7,11 @@ import io.github.ibramsou.netty.messaging.api.session.SessionConfig;
 import io.github.ibramsou.netty.messaging.core.network.MessagingNetwork;
 import io.github.ibramsou.netty.messaging.core.session.AbstractSession;
 import io.github.ibramsou.netty.messaging.core.session.ClientSession;
-import io.netty.channel.*;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 
 import java.net.InetSocketAddress;
 
@@ -26,7 +30,7 @@ public class MessagingInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) {
         final InetSocketAddress address = (InetSocketAddress) channel.localAddress();
         final SessionConfig config = session.config();
-        if (this.session instanceof ClientSession || config.get(MessagingOptions.AUTHORIZE_INCOMING_ADDRESSES) || address.getHostName().equals("127.0.0.1")) {
+        if (this.session instanceof ClientSession || config.get(MessagingOptions.AUTHORIZE_INCOMING_ADDRESSES) || address.getAddress().isLoopbackAddress()) {
             config.get(MessagingOptions.CHANNEL).forEach((channelOption, o) -> channel.config().setOption((ChannelOption) channelOption, o));
             final Network network = new MessagingNetwork(this.messaging, this.session);
             ChannelPipeline pipeline = channel.pipeline();
