@@ -102,7 +102,19 @@ public interface Network extends TaskHandler {
     @Nullable
     Channel getChannel();
 
+    /**
+     * Create a new packet buffer
+     *
+     * @param buffer byte buffer
+     * @return an instance of {@link PacketBuffer}
+     */
     PacketBuffer createBuffer(ByteBuf buffer);
 
+    /**
+     * Get var int size
+     *
+     * @param length size length
+     * @return integer
+     */
     int getVarIntSize(int length);
 }
