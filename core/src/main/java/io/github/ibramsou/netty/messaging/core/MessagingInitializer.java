@@ -7,7 +7,11 @@ import io.github.ibramsou.netty.messaging.api.session.SessionConfig;
 import io.github.ibramsou.netty.messaging.core.network.MessagingNetwork;
 import io.github.ibramsou.netty.messaging.core.session.AbstractSession;
 import io.github.ibramsou.netty.messaging.core.session.ClientSession;
-import io.netty.channel.*;
+
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 
 import java.net.InetSocketAddress;
 
