@@ -7,10 +7,14 @@ import io.github.ibramsou.netty.messaging.api.event.session.SessionDisconnectEve
 import io.github.ibramsou.netty.messaging.api.network.Network;
 import io.github.ibramsou.netty.messaging.api.network.NetworkState;
 import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
+import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
 import io.github.ibramsou.netty.messaging.api.session.Session;
 import io.github.ibramsou.netty.messaging.api.util.DisconnectReason;
+import io.github.ibramsou.netty.messaging.core.packet.PacketBufferFactory;
 import io.github.ibramsou.netty.messaging.core.pipeline.PipelineCompression;
 import io.github.ibramsou.netty.messaging.core.session.AbstractSession;
+import io.github.ibramsou.netty.messaging.core.varint.VarIntFunction;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.handler.timeout.WriteTimeoutException;
@@ -29,6 +33,8 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
     private Channel channel;
     private boolean disconnected;
     private NetworkState state;
+    private PacketBufferFactory bufferFactory;
+    private VarIntFunction varIntFunction;
 
     public MessagingNetwork(Messaging messaging, AbstractSession session) {
         this.messaging = messaging;
@@ -61,6 +67,8 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
         }
 
         this.channel = ctx.channel();
+        this.bufferFactory = this.session.config().get(MessagingOptions.OPTIMIZE_WRITE_VAR_INTS) ? PacketBufferFactory.OPTIMIZED_FACTORY : PacketBufferFactory.DEFAULT_FACTORY;
+        this.varIntFunction = this.session.config().get(MessagingOptions.OPTIMIZE_VAR_INTS_SIZER) ? VarIntFunction.OPTIMIZED_FUNCTION : VarIntFunction.DEFAULT_FUNCTION;
         this.messaging.post(new SessionConnectEvent(this.session, this));
     }
 
@@ -82,7 +90,7 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
             if (handler instanceof PipelineCompression) {
                 ((PipelineCompression) handler).setCompressionThreshold(threshold);
             } else {
-                this.channel.pipeline().addBefore("codec", "compression", new PipelineCompression(threshold));
+                this.channel.pipeline().addBefore("codec", "compression", new PipelineCompression(this, threshold));
             }
         } else {
             if (handler instanceof PipelineCompression) {
@@ -186,5 +194,15 @@ public class MessagingNetwork extends SimpleChannelInboundHandler<MessagingPacke
     @Override
     public Channel getChannel() {
         return channel;
+    }
+
+    @Override
+    public PacketBuffer createBuffer(ByteBuf buffer) {
+        return this.bufferFactory.construct(buffer, this);
+    }
+
+    @Override
+    public int getVarIntSize(int length) {
+        return this.varIntFunction.apply(length);
     }
 }

@@ -1,15 +1,16 @@
 package io.github.ibramsou.netty.messaging.api.network;
 
 import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
+import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
 import io.github.ibramsou.netty.messaging.api.session.Session;
 import io.github.ibramsou.netty.messaging.api.util.DisconnectReason;
 import io.github.ibramsou.netty.messaging.api.util.TaskHandler;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -100,4 +101,8 @@ public interface Network extends TaskHandler {
      */
     @Nullable
     Channel getChannel();
+
+    PacketBuffer createBuffer(ByteBuf buffer);
+
+    int getVarIntSize(int length);
 }

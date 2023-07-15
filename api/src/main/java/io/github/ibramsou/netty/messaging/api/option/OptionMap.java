@@ -1,16 +1,15 @@
 package io.github.ibramsou.netty.messaging.api.option;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
-public class OptionMap<K, V> extends Option<Map<K, V>> {
+public class OptionMap<K, V> extends Option<LinkedHashMap<K, V>> {
 
-    protected OptionMap(Map<K, V> map) {
+    protected OptionMap(LinkedHashMap<K, V> map) {
         super(map);
     }
 
     public OptionMap() {
-        super(new HashMap<>());
+        super(new LinkedHashMap<>());
     }
 
     public final V remove(K key) {
@@ -28,7 +27,8 @@ public class OptionMap<K, V> extends Option<Map<K, V>> {
     }
 
     @Override
-    public Option<Map<K, V>> copy() {
-        return new OptionMap<>(this.value);
+    @SuppressWarnings("unchecked")
+    public Option<LinkedHashMap<K, V>> copy() {
+        return new OptionMap<>((LinkedHashMap<K, V>) this.value.clone());
     }
 }

@@ -1,8 +1,8 @@
 package io.github.ibramsou.netty.messaging.core.pipeline;
 
+import io.github.ibramsou.netty.messaging.api.network.Network;
 import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
 import io.github.ibramsou.netty.messaging.api.pipeline.PipelineHandler;
-import io.github.ibramsou.netty.messaging.core.packet.MessagingPacketBuffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,12 +17,15 @@ public class PipelineCompression extends ByteToMessageCodec<ByteBuf> implements 
 
     private static final int MAX_COMPRESSED_SIZE = 2097152;
 
+    private final Network network;
+
     private int threshold;
     private final Inflater inflater;
     private final Deflater deflater;
     private final byte[] buffer;
 
-    public PipelineCompression(int threshold) {
+    public PipelineCompression(Network network, int threshold) {
+        this.network = network;
         this.threshold = threshold;
         this.inflater = new Inflater();
         this.deflater = new Deflater();
@@ -32,7 +35,7 @@ public class PipelineCompression extends ByteToMessageCodec<ByteBuf> implements 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
         int size = in.readableBytes();
-        PacketBuffer buffer = new MessagingPacketBuffer(out, null);
+        PacketBuffer buffer = this.network.createBuffer(out);
 
         if (size < this.threshold) {
             buffer.writeVarInt(0);
@@ -56,7 +59,7 @@ public class PipelineCompression extends ByteToMessageCodec<ByteBuf> implements 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         if (in.readableBytes() != 0) {
-            PacketBuffer buffer = new MessagingPacketBuffer(in, null);
+            PacketBuffer buffer = this.network.createBuffer(in);
             int size = buffer.readVarInt();
 
             if (size == 0) {

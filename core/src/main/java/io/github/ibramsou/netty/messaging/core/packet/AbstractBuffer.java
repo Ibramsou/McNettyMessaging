@@ -9,12 +9,12 @@ import io.netty.handler.codec.EncoderException;
 
 import java.nio.charset.StandardCharsets;
 
-public class MessagingPacketBuffer implements PacketBuffer {
+abstract class AbstractBuffer implements PacketBuffer {
 
     private final ByteBuf buffer;
     private final Network network;
 
-    public MessagingPacketBuffer(ByteBuf buffer, Network network) {
+    protected AbstractBuffer(ByteBuf buffer, Network network) {
         this.buffer = buffer;
         this.network = network;
     }
@@ -52,8 +52,8 @@ public class MessagingPacketBuffer implements PacketBuffer {
     @Override
     public PacketBuffer writeString(String value) {
         byte[] array = value.getBytes(StandardCharsets.UTF_8);
-        if (array.length > 32767) {
-            throw new EncoderException("String too big (was " + value.length() + " bytes encoded, max " + 32767 + ")");
+        if (array.length > Short.MAX_VALUE) {
+            throw new EncoderException("String too big (was " + value.length() + " bytes encoded, max " + Short.MAX_VALUE + ")");
         } else {
             this.writeVarInt(array.length);
             this.writeBytes(array);
@@ -64,7 +64,7 @@ public class MessagingPacketBuffer implements PacketBuffer {
 
     @Override
     public String readString() {
-        return null;
+        return readString(Short.MAX_VALUE);
     }
 
     @Override
@@ -98,27 +98,6 @@ public class MessagingPacketBuffer implements PacketBuffer {
         byte[] array = new byte[this.readVarInt()];
         this.readBytes(array);
         return array;
-    }
-
-    @Override
-    public PacketBuffer writeVarInt(int value) {
-        if ((value & (0xFFFFFFFF << 7)) == 0) {
-            writeByte(value);
-        } else if ((value & (0xFFFFFFFF << 14)) == 0) {
-            writeShort((value & 0x7F | 0x80) << 8 | (value >>> 7));
-        } else {
-            writeVarInt_(value);
-        }
-        return this;
-    }
-
-    private void writeVarInt_(int input) {
-        while ((input & -128) != 0) {
-            this.writeByte(input & 127 | 128);
-            input >>>= 7;
-        }
-
-        this.writeByte(input);
     }
 
     @Override
@@ -215,5 +194,10 @@ public class MessagingPacketBuffer implements PacketBuffer {
     @Override
     public byte[] array() {
         return this.buffer.array();
+    }
+
+    @Override
+    public PacketBuffer newBuffer(ByteBuf buf) {
+        return this.network.createBuffer(buf);
     }
 }

@@ -5,7 +5,6 @@ import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
 import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
 import io.github.ibramsou.netty.messaging.api.packet.PacketDirection;
 import io.github.ibramsou.netty.messaging.api.pipeline.PipelineHandler;
-import io.github.ibramsou.netty.messaging.core.packet.MessagingPacketBuffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
@@ -29,7 +28,7 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket> implement
 
         try {
             int packetId = this.network.getState().getPacketId(packet);
-            PacketBuffer buffer = new MessagingPacketBuffer(out, this.network);
+            PacketBuffer buffer = this.network.createBuffer(out);
             packet.setNetwork(this.network);
             packet.setDirection(PacketDirection.SERVER_BOUND);
             buffer.writeVarInt(packetId);
@@ -46,7 +45,7 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket> implement
 
 
         if (in.readableBytes() != 0) {
-            PacketBuffer buffer = new MessagingPacketBuffer(in, this.network);
+            PacketBuffer buffer = this.network.createBuffer(in);
             final int packetId = buffer.readVarInt();
             MessagingPacket packet = this.network.getState().constructPacketFromId(this.network, packetId, in);
             if (packet == null) {

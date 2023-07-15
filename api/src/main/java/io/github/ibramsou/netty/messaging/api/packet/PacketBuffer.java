@@ -61,4 +61,6 @@ public interface PacketBuffer {
     float readFloat();
 
     byte[] array();
+
+    PacketBuffer newBuffer(ByteBuf buf);
 }

@@ -31,6 +31,8 @@ public abstract class AbstractSession implements Session {
     public void connect() {
         String host = this.config.get(MessagingOptions.HOST);
         int port = this.config.get(MessagingOptions.PORT);
+        System.out.println("Host: " + host);
+        System.out.println("PORT: " + port);
         InetSocketAddress address;
         try {
             final InetAddress resolved = InetAddress.getByName(host);

@@ -6,6 +6,7 @@ import io.github.ibramsou.netty.messaging.api.option.OptionMap;
 import io.github.ibramsou.netty.messaging.api.option.OptionValue;
 import io.github.ibramsou.netty.messaging.api.pipeline.PipelineFactory;
 import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
@@ -13,6 +14,14 @@ public interface MessagingOptions {
 
      // Global messaging settings
 
+    /**
+     * Optimize write var int methods
+     */
+    OptionValue<Boolean> OPTIMIZE_WRITE_VAR_INTS = new OptionValue<>(true);
+    /**
+     * Optimize get var ints size method
+     */
+    OptionValue<Boolean> OPTIMIZE_VAR_INTS_SIZER = new OptionValue<>(true);
     /**
      * Enable error throws when an unregistered incoming packet is received
      */
@@ -45,6 +54,7 @@ public interface MessagingOptions {
      * Add custom pipeline handlers for encoding and decoding
      */
     OptionMap<String, PipelineFactory> BEFORE_PIPELINE_HANDLERS = new OptionMap<String, PipelineFactory>()
+            .set("timeout", network -> new ReadTimeoutHandler(30))
             .set("sizer", Messaging.getInstance().getPipelineFactories().getSizerFactory())
             .set("codec", Messaging.getInstance().getPipelineFactories().getCodecFactory());
     OptionMap<String, PipelineFactory> AFTER_PIPELINE_HANDLERS = new OptionMap<>();

@@ -3,7 +3,6 @@ package client;
 import io.github.ibramsou.netty.messaging.api.Messaging;
 import io.github.ibramsou.netty.messaging.api.MessagingOptions;
 import io.github.ibramsou.netty.messaging.api.event.session.SessionConnectEvent;
-import io.github.ibramsou.netty.messaging.api.network.NetworkState;
 import io.github.ibramsou.netty.messaging.api.packet.impl.MessagePacket;
 import io.github.ibramsou.netty.messaging.api.session.Session;
 import io.github.ibramsou.netty.messaging.api.session.SessionConfig;
@@ -24,7 +23,7 @@ public class Client {
         SessionConfig config = session.config();
         config.set(MessagingOptions.THROW_UNKNOWN_PACKET_ERRORS, true);
         config.set(MessagingOptions.HOST, "localhost");
-        config.set(MessagingOptions.PORT, 4448);
+        config.set(MessagingOptions.PORT, 25565);
         config.set(MessagingOptions.CHANNEL, ChannelOption.TCP_NODELAY, true);
         config.set(MessagingOptions.DEFAULT_NETWORK_STATE, TestCustomState.getCustomState());
         System.out.println("REGISTERED STATE: " + config.get(MessagingOptions.DEFAULT_NETWORK_STATE).getName());

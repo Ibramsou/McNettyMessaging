@@ -6,7 +6,6 @@ import io.github.ibramsou.netty.messaging.api.network.NetworkState;
 import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
 import io.github.ibramsou.netty.messaging.api.packet.PacketDirection;
 import io.github.ibramsou.netty.messaging.api.packet.PacketFactory;
-import io.github.ibramsou.netty.messaging.core.packet.MessagingPacketBuffer;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 
@@ -90,7 +89,7 @@ public class MessagingNetworkState implements NetworkState {
         if (factory == null) return null;
         MessagingPacket packet;
         try {
-            packet = factory.construct(new MessagingPacketBuffer(buf, network));
+            packet = factory.construct(network.createBuffer(buf));
         } catch (Exception e) {
             throw new DecoderException("Cannot read packet ID: " + id, e);
         }

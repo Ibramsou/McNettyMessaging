@@ -26,7 +26,7 @@ public class MessagingInitializer extends ChannelInitializer<Channel> {
     protected void initChannel(Channel channel) {
         final InetSocketAddress address = (InetSocketAddress) channel.localAddress();
         final SessionConfig config = session.config();
-        if (this.session instanceof ClientSession || config.get(MessagingOptions.AUTHORIZE_INCOMING_ADDRESSES) || address.getHostName().equals("127.0.0.1")) {
+        if (this.session instanceof ClientSession || config.get(MessagingOptions.AUTHORIZE_INCOMING_ADDRESSES) || address.getAddress().isLoopbackAddress()) {
             config.get(MessagingOptions.CHANNEL).forEach((channelOption, o) -> channel.config().setOption((ChannelOption) channelOption, o));
             final Network network = new MessagingNetwork(this.messaging, this.session);
             ChannelPipeline pipeline = channel.pipeline();
