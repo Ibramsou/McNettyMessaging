@@ -10,8 +10,8 @@ repositories {
 dependencies {
     implementation 'io.netty:netty-all:4.1.86.Final'
     implementation 'com.google.code.gson:gson:2.8.9'
-    implementation 'io.github.ibramsou:mc-netty-messaging-api:2.0.1'
-    implementation 'io.github.ibramsou:mc-netty-messaging-core:2.0.1'
+    implementation 'io.github.ibramsou:mc-netty-messaging-api:2.0.2'
+    implementation 'io.github.ibramsou:mc-netty-messaging-core:2.0.2'
 }
 ```
 ### Maven
