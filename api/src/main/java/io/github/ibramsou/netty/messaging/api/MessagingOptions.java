@@ -15,6 +15,10 @@ public interface MessagingOptions {
      // Global messaging settings
 
     /**
+     * Skip unknown incoming packets bytes
+     */
+    OptionValue<Boolean> SKIP_UNKNOWN_PACKETS_BYTES = new OptionValue<>(true);
+    /**
      * Optimize write var int methods
      */
     OptionValue<Boolean> OPTIMIZE_WRITE_VAR_INTS = new OptionValue<>(true);

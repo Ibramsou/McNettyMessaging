@@ -102,17 +102,20 @@ abstract class AbstractBuffer implements PacketBuffer {
 
     @Override
     public int readVarInt() {
-        int value = 0;
-        int size = 0;
-        int b;
-        while (((b = this.buffer.readByte()) & 0x80) == 0x80) {
-            value |= (b & 0x7F) << (size++ * 7);
-            if (size > 5) {
-                throw new DecoderException("VarInt too long (length must be <= 5)");
-            }
-        }
+        int i = 0;
+        int j = 0;
 
-        return value | ((b & 0x7F) << (size * 7));
+        byte b0;
+
+        do {
+            b0 = this.readByte();
+            i |= (b0 & 127) << j++ * 7;
+            if (j > 5) {
+                throw new RuntimeException("VarInt too big");
+            }
+        } while ((b0 & 128) == 128);
+
+        return i;
     }
 
     @Override

@@ -1,3 +1,10 @@
+repositories {}
+
 dependencies {
     implementation project(':mc-netty-messaging-api')
+    implementation 'net.kyori:adventure-api:4.14.0'
+    implementation 'net.kyori:adventure-text-serializer-json:4.14.0'
+    implementation 'net.kyori:adventure-text-serializer-gson:4.14.0'
+    implementation 'net.kyori:adventure-text-serializer-json-legacy-impl:4.14.0'
+    implementation 'net.kyori:adventure-text-serializer-gson-legacy-impl:4.14.0'
 }

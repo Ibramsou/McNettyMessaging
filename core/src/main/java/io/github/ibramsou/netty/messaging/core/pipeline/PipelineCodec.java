@@ -1,5 +1,6 @@
 package io.github.ibramsou.netty.messaging.core.pipeline;
 
+import io.github.ibramsou.netty.messaging.api.MessagingOptions;
 import io.github.ibramsou.netty.messaging.api.network.Network;
 import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
 import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
@@ -49,6 +50,9 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket> implement
             final int packetId = buffer.readVarInt();
             MessagingPacket packet = this.network.getState().constructPacketFromId(this.network, packetId, in);
             if (packet == null) {
+                if (network.getSession().config().get(MessagingOptions.SKIP_UNKNOWN_PACKETS_BYTES)) {
+                    in.skipBytes(buffer.buffer().readableBytes());
+                }
                 return;
             }
             packet.setNetwork(this.network);
