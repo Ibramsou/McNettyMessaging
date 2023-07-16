@@ -30,12 +30,12 @@ dependencies {
     <dependency>
         <groupId>io.github.ibramsou</groupId>
         <artifactId>mc-netty-messaging-api</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
     <dependency>
         <groupId>io.github.ibramsou</groupId>
         <artifactId>mc-netty-messaging-core</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.2</version>
     </dependency>
 </dependencies>
 ```
