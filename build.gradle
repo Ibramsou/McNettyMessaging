@@ -52,8 +52,6 @@ subprojects { subproject ->
                 artifactId = subproject.name
                 version = project.version
 
-
-
                 pom {
                     name = 'McNettyMessaging'
                     description = 'Mc Netty Messaging is a open-source Java Library used to interract between a Client <-> Server'
@@ -81,12 +79,11 @@ subprojects { subproject ->
         }
         repositories {
             maven {
-                name = "nexus"
-                url "http://103.252.90.238:8081/repository/maven-releases/"
-                allowInsecureProtocol = true
+                name = "OSSRH"
+                url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
                 credentials {
-                    username imrineUsername
-                    password imrinePassword
+                    username sonatypeUsername
+                    password sonatypePassword
                 }
             }
         }
