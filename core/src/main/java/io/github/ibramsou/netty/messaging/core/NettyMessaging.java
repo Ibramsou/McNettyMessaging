@@ -14,7 +14,7 @@ import io.github.ibramsou.netty.messaging.core.session.ServerSession;
 
 import javax.annotation.Nonnull;
 
-public class NettyMessaging extends Messaging {
+public class NettyMessaging extends MessagingEventHandler implements Messaging {
 
     private final MessagingNetworkRegistry registry = new MessagingNetworkRegistry();
     private final MessagingPipelineFactories factories = new MessagingPipelineFactories();

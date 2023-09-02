@@ -202,7 +202,7 @@ import io.github.ibramsou.netty.messaging.api.session.SessionType;
 import io.netty.channel.ChannelOption;
 import packet.TestPacket;
 
-public class Client {
+public class client.Client {
 
     public static void main(String[] args) {
         Messaging.getInstance().getRegistry().register("Example State");
