@@ -35,6 +35,14 @@ public abstract class MessagingPacket implements Event {
     }
 
     /**
+     * Get if packet should be read or just skipped
+     * @return a boolean
+     */
+    public boolean shouldRead() {
+        return true;
+    }
+
+    /**
      * Method is called when the packet is sent or received
      * @param network connected network
      */

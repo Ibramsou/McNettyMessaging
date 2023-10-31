@@ -13,16 +13,14 @@ plugins {
 }
 
 allprojects {
-    group 'io.github.ibramsou'
-    version '2.2.0'
+    group 'fr.github.ibramsou'
+    version '2.3.0'
 }
 
 apply plugin: 'java'
 
 subprojects { subproject ->
     apply plugin: 'java'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
     apply plugin: 'java-library'
 
     repositories {
@@ -42,56 +40,60 @@ subprojects { subproject ->
 
     compileJava.options.encoding = 'UTF-8'
 
+    if (subproject.name != 'test') {
+        apply plugin: 'maven-publish'
+        apply plugin: 'signing'
 
+        publishing {
+            publications {
+                jar(MavenPublication) {
+                    from components.java
+                    groupId = 'io.github.ibramsou'
+                    artifactId = subproject.name
+                    version = project.version
 
-    publishing {
-        publications {
-            jar(MavenPublication) {
-                from components.java
-                groupId = 'io.github.ibramsou'
-                artifactId = subproject.name
-                version = project.version
-
-                pom {
-                    name = 'McNettyMessaging'
-                    description = 'Mc Netty Messaging is a open-source Java Library used to interract between a Client <-> Server'
-                    url = 'https://github.com/Ibramsou/McNettyMessaging'
-                    licenses {
-                        license {
-                            name = 'The Apache License, Version 2.0'
-                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id = 'Bramsou'
-                            name = 'Ibrahim'
-                            email = 'braimsou@gmail.com'
-                        }
-                    }
-                    scm {
-                        connection = 'scm:git:git:github.com/Ibramsou/McNettyMessaging.git'
-                        developerConnection = 'scm:git:ssh://github.com:Ibramsou/McNettyMessaging.git'
+                    pom {
+                        name = 'McNettyMessaging'
+                        description = 'Mc Netty Messaging is a open-source Java Library used to interract between a Client <-> Server'
                         url = 'https://github.com/Ibramsou/McNettyMessaging'
+                        licenses {
+                            license {
+                                name = 'The Apache License, Version 2.0'
+                                url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            }
+                        }
+                        developers {
+                            developer {
+                                id = 'Bramsou'
+                                name = 'Ibrahim'
+                                email = 'braimsou@gmail.com'
+                            }
+                        }
+                        scm {
+                            connection = 'scm:git:git:github.com/Ibramsou/McNettyMessaging.git'
+                            developerConnection = 'scm:git:ssh://github.com:Ibramsou/McNettyMessaging.git'
+                            url = 'https://github.com/Ibramsou/McNettyMessaging'
+                        }
+                    }
+                }
+            }
+            repositories {
+                maven {
+                    name = "OSSRH"
+                    url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+                    credentials {
+                        username sonatypeUsername
+                        password sonatypePassword
                     }
                 }
             }
         }
-        repositories {
-            maven {
-                name = "OSSRH"
-                url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
-                credentials {
-                    username sonatypeUsername
-                    password sonatypePassword
-                }
-            }
+
+        signing {
+            sign publishing.publications.jar
         }
     }
 
-    signing {
-        sign publishing.publications.jar
-    }
 }
 
 

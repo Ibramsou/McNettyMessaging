@@ -1,11 +1,11 @@
 package packet;
 
-import io.github.ibramsou.netty.messaging.api.packet.MessagingPacket;
 import io.github.ibramsou.netty.messaging.api.packet.PacketBuffer;
+import io.github.ibramsou.netty.messaging.api.packet.impl.SkippingPacket;
 
 import javax.annotation.Nonnull;
 
-public class TestPacket extends MessagingPacket {
+public class TestPacket extends SkippingPacket {
 
     private final int randomInteger;
 
@@ -14,7 +14,7 @@ public class TestPacket extends MessagingPacket {
     }
 
     public TestPacket(@Nonnull PacketBuffer buffer) {
-        this.randomInteger = buffer.readInt();
+        this.randomInteger = 0;
     }
 
     @Override

@@ -58,9 +58,14 @@ public class PipelineCodec extends ByteToMessageCodec<MessagingPacket> implement
             packet.setNetwork(this.network);
             packet.setDirection(PacketDirection.CLIENT_BOUND);
 
-            if (in.readableBytes() > 0) {
-                throw new DecoderException("Cannot read packet " + packet.getClass().getSimpleName() + " start(" + in.readableBytes() + "), end(" + in.readableBytes() + ")");
+            if (packet.shouldRead()) {
+                if (in.readableBytes() > 0) {
+                    throw new DecoderException("Cannot read packet " + packet.getClass().getSimpleName() + " start(" + in.readableBytes() + "), end(" + in.readableBytes() + ")");
+                }
+            } else {
+                in.skipBytes(buffer.buffer().readableBytes());
             }
+
             out.add(packet);
         }
     }
